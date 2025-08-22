@@ -1,0 +1,66 @@
+<script setup>
+    import { ref } from 'vue';
+    import { useStore } from 'vuex';
+    
+    import { required, email, helpers } from "@vuelidate/validators";
+    import { useVuelidate } from "@vuelidate/core";
+
+    // Estado reativo
+    const emailField = ref("");
+    const passwordField = ref("");
+    const submitted = ref(false);
+    const authError = ref(null);
+    const tryingToLogIn = ref(false);
+    // const isAuthError = ref(false);
+    const processing = ref(false);
+
+    // Vuelidate setup
+    const rules = {
+      emailField: { required: helpers.withMessage("Email is required", required), emailField: helpers.withMessage("Please enter valid email", email) },
+      passwordField: { required: helpers.withMessage("Password is required", required) },
+    };
+
+    const store = useStore();
+
+    const v$ = useVuelidate(rules, { emailField, passwordField });
+
+    // Métodos
+    const tryToLogIn = async () => {
+      processing.value = true;
+      submitted.value = true;
+
+      console.log("tryToLogIn.1");
+
+      v$.value.$touch();
+      console.log("tryToLogIn.2", v$.value);
+      if (v$.value.$invalid) {
+        return;
+      }
+      console.log("tryToLogIn.3", process.env.VUE_APP_DEFAULT_AUTH);
+      if (process.env.VUE_APP_DEFAULT_AUTH === "authapi") {
+        tryingToLogIn.value = true;
+        authError.value = null;
+
+        if (emailField.value && passwordField.value) {
+          try {
+            // chamando o metodo login definido no helpers (authMethods)
+            await store.dispatch('auth/login', { email: emailField.value, password: passwordField.value });
+          } catch (error) {
+            console.log(error)
+          }
+          
+        }
+      }
+    };
+</script>
+
+<template>
+  <AdminLayout>
+    <v-row align="center" justify="center">
+      <v-col cols="12" md="8" class="text-center">
+        <h1>Você está logado!</h1>
+        <p>Parabéns, acesso liberado.</p>
+      </v-col>
+    </v-row>
+  </AdminLayout>
+</template>
