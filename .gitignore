@@ -1,6 +1,7 @@
 # Arquivos do mac
 .DS_Store
 .DS_Store?
+**/.DS_Store
 
 # Logs
 logs
