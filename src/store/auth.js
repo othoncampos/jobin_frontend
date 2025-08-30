@@ -23,6 +23,7 @@ export const useAuthStore = defineStore('auth', {
               this.isAuthenticated = true
               this.access_token = resp.access_token
               const secretKey = import.meta.env.VITE_APP_SECRET_KEY;
+              console.log('Secret Key:', secretKey);
               if (typeof secretKey !== 'string') {
                   throw new TypeError('Chave secreta deve ser uma string');
               }
